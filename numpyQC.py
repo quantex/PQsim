@@ -33,3 +33,14 @@ def h(n, qb0, vec):
         (vec.reshape(count,2,count_r)[:,0,:] + vec.reshape(count,2,count_r)[:,1,:])*sq2d
     vec.reshape(count,2,count_r)[:,1,:] = \
         vec.reshape(count,2,count_r)[:,0,:] - sq2*vec.reshape(count,2,count_r)[:,1,:]
+
+def apply_1qb(n, op, qb0, vec):
+    count = 2**(n-qb0-1)
+    count_r = 2**(qb0)
+
+    temp0 = op[0,0]*vec.reshape(count,2,count_r)[:,0,:] + op[0,1]*vec.reshape(count,2,count_r)[:,1,:]
+    
+    vec.reshape(count,2,count_r)[:,1,:] = \
+        op[1,0]*vec.reshape(count,2,count_r)[:,0,:] + op[1,1]*vec.reshape(count,2,count_r)[:,1,:]
+
+    vec.reshape(count,2,count_r)[:,0,:] = temp0
