@@ -1,5 +1,7 @@
 import numpy as np
+from numba import njit
 
+@njit
 def cz(n, qb0, qb1, vec):
     '''
     Does a n-qubit cz on vec, between qb0 and qb1
@@ -12,6 +14,7 @@ def cz(n, qb0, qb1, vec):
     vec.reshape(count_large,2,count_small,2,-1)[:,1,:,1,:] = \
         -vec.reshape(count_large,2,count_small,2,-1)[:,1,:,1,:]
 
+@njit
 def z(n, qb0, vec):
     count = 2**(n-qb0-1)
     count_r = 2**(qb0)
@@ -22,6 +25,7 @@ def z(n, qb0, vec):
 
     return vin.reshape(2**n)
 
+@njit
 def h(n, qb0, vec):
     count = 2**(n-qb0-1)
     count_r = 2**(qb0)
@@ -34,6 +38,7 @@ def h(n, qb0, vec):
     vec.reshape(count,2,count_r)[:,1,:] = \
         vec.reshape(count,2,count_r)[:,0,:] - sq2*vec.reshape(count,2,count_r)[:,1,:]
 
+@njit
 def apply_1qb(n, op, qb0, vec):
     count = 2**(n-qb0-1)
     count_r = 2**(qb0)
