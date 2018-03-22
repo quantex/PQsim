@@ -49,3 +49,30 @@ def apply_1qb(n, op, qb0, vec):
         op[1,0]*vec.reshape(count,2,count_r)[:,0,:] + op[1,1]*vec.reshape(count,2,count_r)[:,1,:]
 
     vec.reshape(count,2,count_r)[:,0,:] = temp0
+
+@njit
+def modulate_2qb(n, qb0, qb1, modulator, vec):
+    '''
+    Modulator is arranged as qb1,qb2 = [00, 10, 01, 11].
+    '''
+    q0, q1 = (max(qb0,qb1), min(qb0,qb1))
+
+    if qb1>qb0:
+        temp = modulator[2]
+        modulator[2] = modulator[1]
+        modulator[1] = temp
+
+    count_large = 2**(n-q0-1)
+    count_small = 2**(q0-q1-1)
+
+    vec.reshape(count_large,2,count_small,2,-1)[:,0,:,0,:] = \
+        modulator[0]*vec.reshape(count_large,2,count_small,2,-1)[:,0,:,0,:]
+
+    vec.reshape(count_large,2,count_small,2,-1)[:,1,:,0,:] = \
+        modulator[1]*vec.reshape(count_large,2,count_small,2,-1)[:,1,:,0,:]
+        
+    vec.reshape(count_large,2,count_small,2,-1)[:,0,:,1,:] = \
+        modulator[2]*vec.reshape(count_large,2,count_small,2,-1)[:,0,:,1,:]
+    
+    vec.reshape(count_large,2,count_small,2,-1)[:,1,:,1,:] = \
+        modulator[3]*vec.reshape(count_large,2,count_small,2,-1)[:,1,:,1,:]
