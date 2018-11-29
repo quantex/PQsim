@@ -2,6 +2,23 @@ import numpy as np
 from numba import njit
 
 @njit
+def do_circ(nq, names, qargs, parms, vec):
+    idx_parm = 0
+    for idx, n in enumerate(names):
+        if n=='cz':
+            cz(nq, qargs[idx][0], qargs[idx][1], vec)
+        elif n=='h':
+            h(nq, qargs[idx][0], vec)
+        elif n=='u':
+            op = parms[idx_parm]
+            idx_parm += 1
+            apply_1qb(nq, op, qargs[idx][0], vec)
+        elif n=='mod2qb':
+            mod = parms[idx_parm].reshape(4)
+            idx_parm += 1
+            modulate_2qb(nq, qargs[idx][0], qargs[idx][1], mod, vec)
+
+@njit
 def cz(n, qb0, qb1, vec):
     '''
     Does a n-qubit cz on vec, between qb0 and qb1

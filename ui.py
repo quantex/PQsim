@@ -1,29 +1,18 @@
 import numpy as np
+import numbaQC
+import numpyQC
 
 class qsim():
     def __init__(self, backend='numba'):
+        self.backend = backend
         if backend=='numba':
-            import numbaQC as core
+            self.nQC = numbaQC
         elif backend=='numpy':
-            import numpyQC as core
+            self.nQC = numpyQC
 
-        @njit
-        def do_circ(nq, names, qargs, parms, vec):
-            idx_parm = 0
-            for idx, n in enumerate(names):
-                if n=='cz':
-                    cz(nq, qargs[idx][0], qargs[idx][1], vec)
-                elif n=='h':
-                    h(nq, qargs[idx][0], vec)
-                elif n=='u':
-                    op = parms[idx_parm]
-                    idx_parm += 1
-                    apply_1qb(nq, op, qargs[idx][0], vec)
-                elif n=='mod2qb':
-                    mod = parms[idx_parm].reshape(4)
-                    idx_parm += 1
-                    modulate_2qb(nq, qargs[idx][0], qargs[idx][1], mod, vec)
-    
+    def run(self, nq, names, qargs, parms, vec):
+        self.nQC(nq, names, qargs, parms, vec)
+
     @staticmethod
     def get_circ_data(circ, gate_dict):
         lut = circ.qubits
