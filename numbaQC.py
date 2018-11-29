@@ -66,4 +66,4 @@ def modulate_2qb(n, qb0, qb1, modulator, vec):
         i1 = i%(2**qb1) # qb1 value
 
         # Modulate
-        vec[i] = modulator[2*i1 + i0]*vec[l]
+        vec[i] = modulator[2*i1 + i0]*vec[i]
