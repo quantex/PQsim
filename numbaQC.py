@@ -57,7 +57,7 @@ def apply_1qb(n, op, qb0, vec):
         vec[j] = temp0
 
 @njit(parallel=True)
-def modulate_1qb(n, qb0, qb1, modulator, vec):
+def modulate_2qb(n, qb0, qb1, modulator, vec):
     stripe_1 = 2**(qb1)
     stripe_0 = 2**(qb0)
     
