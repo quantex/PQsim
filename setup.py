@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='PQsim',
+    name='pqsim',
     version='0.1',
     author='Edwin Tham',
     author_email='quantum.explorer@gmail.com',
