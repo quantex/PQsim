@@ -23,7 +23,7 @@ class qsim():
 
         if len(vec)!=2**nq:
             vec = np.zeros(2**nq, dtype=complex)
-            vec[0] = 0
+            vec[0] = 1.
             returnstate = True
 
         self.nQC.do_circ(nq, names, qargs, parms, vec)
