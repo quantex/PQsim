@@ -14,7 +14,7 @@ class qsim():
             self.nQC = numpyQC
 
     def run(self, nq, names, qargs, parms, vec):
-        self.nQC(nq, names, qargs, parms, vec)
+        self.nQC.do_circ(nq, names, qargs, parms, vec)
 
     @staticmethod
     def get_circ_data(circ, gate_dict):
