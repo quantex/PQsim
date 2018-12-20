@@ -1,6 +1,6 @@
 import numpy as np
-import numbaQC
-import numpyQC
+from . import numbaQC
+from . import numpyQC
 
 class qsim():
     def __init__(self, backend='numba'):
