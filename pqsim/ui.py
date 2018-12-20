@@ -13,8 +13,23 @@ class qsim():
         elif backend=='numpy':
             self.nQC = numpyQC
 
-    def run(self, nq, names, qargs, parms, vec):
+    def run(self, nq, names, qargs, parms, vec=[]):
+        '''
+        Initiate run of a circuit. If no statevector
+        is provided, initialize a fresh statevector in
+        the zero state.
+        '''
+        returnstate = False
+
+        if len(vec)!=2**nq:
+            vec = np.zeros(2**nq, dtype=complex)
+            vec[0] = 0
+            returnstate = True
+
         self.nQC.do_circ(nq, names, qargs, parms, vec)
+
+        if returnstate:
+            return vec
 
     @staticmethod
     def get_circ_data(circ, gate_dict):
