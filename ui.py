@@ -4,6 +4,9 @@ import numpyQC
 
 class qsim():
     def __init__(self, backend='numba'):
+        '''
+        Initialize the convenience class.
+        '''
         self.backend = backend
         if backend=='numba':
             self.nQC = numbaQC
@@ -15,6 +18,14 @@ class qsim():
 
     @staticmethod
     def get_circ_data(circ, gate_dict):
+        '''
+        This is a compatibility layer for QISkit.
+        Given a QISkit circuit, return the lists of instructions
+        and parameters necessary to call do_circ().
+        Args:
+            circ:      A QISkit circuit object.
+            gate_dict: A dictionary enumerating all types / count of gates in circ.
+        '''
         lut = circ.qubits
         nqb = len(lut)
         ngates = len(circ)
@@ -47,6 +58,9 @@ class qsim():
 
     @staticmethod
     def get_circ_stat(circ):
+        '''
+        Given a QISkit circuit, count up the number of each type of gate.
+        '''
         gates = {}
         for dat in circ:
             name = dat[0].name

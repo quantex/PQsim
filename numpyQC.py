@@ -3,6 +3,16 @@ from numba import njit
 
 @njit
 def do_circ(nq, names, qargs, parms, vec):
+    '''
+    Runner function. Calls appropriate numerical routines below
+    to effect gates as listed in names, qargs, and parms.
+
+    Args:
+        names: List of strings indicating which gate to perform.
+        qargs: List of integer 2-tuples, indicating which qubit(s) the gate is acting on.
+        parms: List of parameter(s) where required, i.e. when a gate is parameterized.
+        vec:   An input statevector.
+    '''
     idx_parm = 0
     for idx, n in enumerate(names):
         if n=='cz':
@@ -21,7 +31,8 @@ def do_circ(nq, names, qargs, parms, vec):
 @njit
 def cz(n, qb0, qb1, vec):
     '''
-    Does a n-qubit cz on vec, between qb0 and qb1
+    Does a controlled-Z operation between qb0 and qb1,
+    on vec, an n-qubit statevector.
     '''
     q0, q1 = (max(qb0,qb1), min(qb0,qb1))
 
@@ -44,6 +55,10 @@ def z(n, qb0, vec):
 
 @njit
 def h(n, qb0, vec):
+    '''
+    Does a Hadamard operation targeting qb0,
+    on vec, an n-qubit statevector.
+    '''
     count = 2**(n-qb0-1)
     count_r = 2**(qb0)
 
@@ -57,6 +72,10 @@ def h(n, qb0, vec):
 
 @njit
 def apply_1qb(n, op, qb0, vec):
+    '''
+    Applies a 1-qubit operator "op" targeting qb0,
+    on vec, an n-qubit statevector.
+    '''
     count = 2**(n-qb0-1)
     count_r = 2**(qb0)
 
@@ -70,7 +89,11 @@ def apply_1qb(n, op, qb0, vec):
 @njit
 def modulate_2qb(n, qb0, qb1, modulator, vec):
     '''
-    Modulator is arranged as qb1,qb2 = [00, 10, 01, 11].
+    Modulates vec, an n-qubit statevector,
+    with a 2-qubit modulator pattern.
+
+    This is equivalent to treating the modulator as
+    a diagonal 2-qubit operator acting on qb0 and qb1.
     '''
     q0, q1 = (max(qb0,qb1), min(qb0,qb1))
 
