@@ -65,11 +65,19 @@ def get_phase_1qb(pterm, op):
     else:
         return 1.
 
-def pauli_commute(pvec, op, qargs):
+def pauli_commute(pvec, op, qargs, paulimode=0):
     '''Ruleset for propagation of Pauli operators through Clifford gates.
-    Integer "op" numbers correspond to Clifford gates as listed in gatelut.'''
+    Integer "op" numbers correspond to Clifford gates as listed in gatelut.
+    
+    When paulimode==0, when op is a Pauli operator, it is treated like any
+    other Clifford op, s.t. a global phase is computed and commutation is otherwise
+    trivial. But when paulimode==1, Pauli op is checked against entries in pvec,
+    and cancelled when it matches op. This latter mode is useful for fed-forward
+    clasically-controlled Pauli ops, such as when doing QEC correction rounds.'''
+    phase = 1.
     if op==0:
         qb = qargs[0]
+        phase = get_phase_1qb(pvec[qb], op)
         if pvec[qb]==1:
             pvec[qb] = 2
         elif pvec[qb]==2:
@@ -106,17 +114,28 @@ def pauli_commute(pvec, op, qargs):
         else:
             newsrc = pvec[src]
 
+        if (pvec[src]%2==1) and (pvec[trg]%2==1):
+            phase = -1.
         pvec[src] = newsrc
         pvec[trg] = newtrg
     
     elif op==3:
-        pvec[qargs[0]] = pauli_merge(pvec[qargs[0]], 1)
+        if paulimode==0:
+            phase = get_phase_1qb(pvec[qargs[0]], op)
+        else:
+            pvec[qargs[0]] = pauli_merge(pvec[qargs[0]], 1)
     
     elif op==4:
-        pvec[qargs[0]] = pauli_merge(pvec[qargs[0]], 3)
+        if paulimode==0:
+            phase = get_phase_1qb(pvec[qargs[0]], op)
+        else:
+            pvec[qargs[0]] = pauli_merge(pvec[qargs[0]], 3)
     
     elif op==5:
-        pvec[qargs[0]] = pauli_merge(pvec[qargs[0]], 2)
+        if paulimode==0:
+            phase = get_phase_1qb(pvec[qargs[0]], op)
+        else:
+            pvec[qargs[0]] = pauli_merge(pvec[qargs[0]], 2)
 
     elif op==6 or op==7:
         phase = get_phase_1qb(pvec[qargs[0]], op)
@@ -124,3 +143,5 @@ def pauli_commute(pvec, op, qargs):
         xbit = pvec[qargs[0]]%2
         zbit = (zbit + xbit)%2
         pvec[qargs[0]] = 2*zbit + xbit
+
+    return phase
