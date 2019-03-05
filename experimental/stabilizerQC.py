@@ -1,4 +1,4 @@
-# gatelut = ['h','cx','cz','s']
+# gatelut = ['h','cx','cz','x','y','z','s','sdg']
 
 def pauli_merge(p1, p2):
     '''
@@ -70,8 +70,18 @@ def pauli_commute(pvec, op, qargs):
 
         pvec[src] = newsrc
         pvec[trg] = newtrg
+    
+    elif op==3:
+        pvec[qargs[0]] = pauli_merge(pvec[qargs[0]], 1)
+    
+    elif op==4:
+        pvec[qargs[0]] = pauli_merge(pvec[qargs[0]], 3)
+    
+    elif op==5:
+        pvec[qargs[0]] = pauli_merge(pvec[qargs[0]], 2)
 
-    elif op==3: 
+    elif op==6 or op==7:
+        phase = get_phase_1qb(pvec[qargs[0]], op)
         zbit = pvec[qargs[0]]//2
         xbit = pvec[qargs[0]]%2
         zbit = (zbit + xbit)%2
