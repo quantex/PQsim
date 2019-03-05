@@ -27,6 +27,44 @@ def pauli_demux(nqb, p1):
     
     return plist
 
+def get_phase_1qb(pterm, op):
+    '''Compute global phase incurred while commuting 
+    Pauli term 'pterm' through Clifford 'op'.'''
+    if op==0:
+        if pterm==3:
+            return -1.
+        else:
+            return 1.
+    elif op==3: # If op is X
+        if pterm==1 or pterm==0:
+            return 1.
+        else:
+            return -1.
+    elif op==4: # If op is Y
+        if pterm==3 or pterm==0:
+            return 1.
+        else:
+            return -1.
+    elif op==5: # If op is Z
+        if pterm==2 or pterm==0:
+            return 1.
+        else:
+            return -1.
+    elif op==6: # If op is S
+        xbit = pterm % 2
+        if xbit==1:
+            return -1.j
+        else:
+            return 1.
+    elif op==7: # If op is Sdg
+        xbit = pterm % 2
+        if xbit==1:
+            return 1.j
+        else:
+            return 1.
+    else:
+        return 1.
+
 def pauli_commute(pvec, op, qargs):
     '''Ruleset for propagation of Pauli operators through Clifford gates.
     Integer "op" numbers correspond to Clifford gates as listed in gatelut.'''
