@@ -145,3 +145,87 @@ def pauli_commute(pvec, op, qargs, paulimode=0):
         pvec[qargs[0]] = 2*zbit + xbit
 
     return phase
+
+def check_condition(cvals, condval, contype, conbits):
+    '''Checks if a classically-controlled conditional gate is to be applied.
+    Args:
+        cvals   : Classical-register that controls the gate.
+        condval : Value that determines if a gate is applied.
+        contype : Integer determining how condval is interpreted;
+                If 0, ignore;
+                If 1, apply gate when classical bit in cvals is equal to condval;
+                If 2, apply gate when classical bit in cvals is NOT condval.
+        conbits : List of integer indices specifying which entries in cvals apply.'''
+    val = 0
+    for idx,cb in enumerate(conbits):
+        val = val + 2**idx * cvals[cb]
+    
+    goflag = False
+    if contype==1:
+        goflag = (val==condval)
+    elif contype==2:
+        goflag = (val!=condval)
+    elif contype==0:
+        goflag = True
+    
+    return goflag
+
+def propagate(pvec, carr, noisearray, opnames, noiseid, condval, contype, conbits, opqargs, opcargs):
+    '''Given a starting list of Pauli operators 'pvec', and list of classical bits 'carr', commute
+    pvec through Clifford circuit defined by:
+        noisearray  : An integer array encoding Pauli errors afflicting each Clifford gate.
+        opnames     : Gate names in the circuit (must be member of gatelut)
+        noiseid     : A Boolean array indicating whether a gate is noisy.
+        condval     : Parameter for classical-control of a gate (see check_condition())
+        contype     : Parameter for classical-control of a gate (see check_condition())
+        conbits     : Parameter for classical-control of a gate (see check_condition())
+        opqargs     : Qubits acted upon by gate.
+        opcargs     : Classical bits used by or that determines action of gate.'''
+    idx_noise = 0
+    phase = 1.
+
+    for idx, name in enumerate(opnames):
+        if name<9:
+            do_gate = check_condition(carr, condval[idx], contype[idx], conbits[idx])
+            if do_gate:
+                phase *= pauli_commute(pvec, name, opqargs[idx])
+        
+        elif name==9:
+            carr[opcargs[idx][0]] = pvec[opqargs[idx][0]]%2
+            pvec[opqargs[idx][0]] = 0
+
+        elif name==10:
+            for bit in conbits[idx]: # Fail if pvec term is one of conbits
+                if pvec[opqargs[idx][0]]==bit:
+                    raise Exception("Does not commute!")
+
+        if noiseid[idx]:
+            noisedim = len(opqargs[idx])
+            pchar = pauli_demux(noisedim, noisearray[idx_noise])
+            idx_noise = idx_noise + 1
+
+            for idx_char,pc in enumerate(pchar):
+                pvec[opqargs[idx,idx_char]] = pauli_merge(pvec[opqargs[idx,idx_char]], pc)
+
+    return phase
+
+def propagate_all_samples(qlen, clen, noisearrays, idx_qlog, syndromes,\
+    logicalops, opnames, noiseid, condval, contype, conbits, opqargs, opcargs):
+    '''Like propagate() above, only this acts over many possible instances of Pauli errors.
+    So, instead of a single 'noisearray' as in propagate() above, pass in noisearrays as a
+    LIST of noisearray.'''
+    pvecs = np.zeros((len(noisearrays),qlen), dtype=np.int16)
+    carrs = np.zeros((len(noisearrays),clen), dtype=np.int16)
+
+    checks = np.zeros(len(noisearrays), dtype=np.int8)
+
+    for idx in prange(len(noisearrays)):
+        pvec = np.zeros(qlen, dtype=np.int16)
+        carr = np.zeros(clen, dtype=np.int16)
+        propagate(pvec, carr, noisearrays[idx], opnames, noiseid,\
+            condval, contype, conbits, opqargs, opcargs)
+        
+        pvecs[idx] = pvec
+        carrs[idx] = carr
+
+    return checks, pvecs, carrs
