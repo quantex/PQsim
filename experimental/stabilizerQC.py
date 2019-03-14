@@ -1,5 +1,8 @@
 # gatelut = ['h','cx','cz','x','y','z','s','sdg']
+from numba import njit, jit, prange
+import numpy as np
 
+@njit
 def pauli_merge(p1, p2):
     '''
     Compose two Pauli operators encoded as integers.
@@ -15,6 +18,7 @@ def pauli_merge(p1, p2):
 
     return xbit + 2*zbit
 
+@njit
 def pauli_demux(nqb, p1):
     '''Given an integer encoding a multi-qubit Pauli operator,
     return a list of 1-qb Pauli operators in Little-Endian mode.'''
@@ -27,6 +31,7 @@ def pauli_demux(nqb, p1):
     
     return plist
 
+@njit
 def get_phase_1qb(pterm, op):
     '''Compute global phase incurred while commuting 
     Pauli term 'pterm' through Clifford 'op'.'''
@@ -65,6 +70,7 @@ def get_phase_1qb(pterm, op):
     else:
         return 1.
 
+@njit
 def pauli_commute(pvec, op, qargs, paulimode=0):
     '''Ruleset for propagation of Pauli operators through Clifford gates.
     Integer "op" numbers correspond to Clifford gates as listed in gatelut.
@@ -146,6 +152,7 @@ def pauli_commute(pvec, op, qargs, paulimode=0):
 
     return phase
 
+@njit
 def check_condition(cvals, condval, contype, conbits):
     '''Checks if a classically-controlled conditional gate is to be applied.
     Args:
@@ -170,6 +177,7 @@ def check_condition(cvals, condval, contype, conbits):
     
     return goflag
 
+@njit
 def propagate(pvec, carr, noisearray, opnames, noiseid, condval, contype, conbits, opqargs, opcargs):
     '''Given a starting list of Pauli operators 'pvec', and list of classical bits 'carr', commute
     pvec through Clifford circuit defined by:
@@ -209,6 +217,7 @@ def propagate(pvec, carr, noisearray, opnames, noiseid, condval, contype, conbit
 
     return phase
 
+@njit(parallel=True)
 def propagate_all_samples(qlen, clen, noisearrays, idx_qlog, syndromes,\
     logicalops, opnames, noiseid, condval, contype, conbits, opqargs, opcargs):
     '''Like propagate() above, only this acts over many possible instances of Pauli errors.
