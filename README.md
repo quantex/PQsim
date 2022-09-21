@@ -24,7 +24,7 @@ Even without careful hand optimization and despite its humble Pythonic roots, th
 
 ## Installation
 
-Clone this repository (say to folder `pqsim').
+Clone this repository (say to folder `pqsim`).
 Then, in a Python environment (it must have `pip`), simply invoke: `pip install pqsim`.
 Pre-requisites (Numba and NumPy) should be installed automatically.
 If you wish to experiment with the simulator code directly (again, this is encouraged), invoke `pip install -e pqsim` instead.
