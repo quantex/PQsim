@@ -178,7 +178,7 @@ def check_condition(cvals, condval, contype, conbits):
     return goflag
 
 @njit
-def propagate(pvec, carr, noisearray, opnames, noiseid, condval, contype, conbits, opqargs, opcargs):
+def propagate(pvec, carr, noisearray, opnames, noiseid, condval, contype, conbits, opqargs, opcargs, paulimode=0):
     '''Given a starting list of Pauli operators 'pvec', and list of classical bits 'carr', commute
     pvec through Clifford circuit defined by:
         noisearray  : An integer array encoding Pauli errors afflicting each Clifford gate.
@@ -196,7 +196,7 @@ def propagate(pvec, carr, noisearray, opnames, noiseid, condval, contype, conbit
         if name<9:
             do_gate = check_condition(carr, condval[idx], contype[idx], conbits[idx])
             if do_gate:
-                phase *= pauli_commute(pvec, name, opqargs[idx])
+                phase *= pauli_commute(pvec, name, opqargs[idx], paulimode=paulimode)
         
         elif name==9:
             carr[opcargs[idx][0]] = pvec[opqargs[idx][0]]%2
