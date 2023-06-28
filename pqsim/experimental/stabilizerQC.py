@@ -218,15 +218,13 @@ def propagate(pvec, carr, noisearray, opnames, noiseid, condval, contype, conbit
     return phase
 
 @njit(parallel=True)
-def propagate_all_samples(qlen, clen, noisearrays, idx_qlog, syndromes,\
-    logicalops, opnames, noiseid, condval, contype, conbits, opqargs, opcargs):
+def propagate_all_samples(qlen, clen, noisearrays,\
+    opnames, noiseid, condval, contype, conbits, opqargs, opcargs):
     '''Like propagate() above, only this acts over many possible instances of Pauli errors.
     So, instead of a single 'noisearray' as in propagate() above, pass in noisearrays as a
     LIST of noisearray.'''
     pvecs = np.zeros((len(noisearrays),qlen), dtype=np.int16)
     carrs = np.zeros((len(noisearrays),clen), dtype=np.int16)
-
-    checks = np.zeros(len(noisearrays), dtype=np.int8)
 
     for idx in prange(len(noisearrays)):
         pvec = np.zeros(qlen, dtype=np.int16)
@@ -237,4 +235,4 @@ def propagate_all_samples(qlen, clen, noisearrays, idx_qlog, syndromes,\
         pvecs[idx] = pvec
         carrs[idx] = carr
 
-    return checks, pvecs, carrs
+    return pvecs, carrs
